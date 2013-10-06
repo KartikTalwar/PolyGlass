@@ -28,8 +28,9 @@ def eulerian_magnification(video_filename, image_processing='gaussian', freq_min
 
 def show_frequencies(video_filename, bounds=None):
     """Graph the average value of the video as well as the frequency strength"""
+
     original_video, fps = load_video(video_filename)
-    print fps
+
     averages = []
 
     if bounds:
@@ -71,26 +72,41 @@ def temporal_bandpass_filter(data, fps, freq_min=0.833, freq_max=1, axis=0):
     return scipy.fftpack.ifft(fft, axis=0)
 
 
-def load_video(video_filename):
-    """Load a video into a numpy array"""
-    print "Loading " + video_filename
-    # noinspection PyArgumentList
-    capture = cv2.VideoCapture(video_filename)
-    frame_count = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT))
-    width, height = get_capture_dimensions(capture)
-    fps = int(capture.get(cv.CV_CAP_PROP_FPS))
-    x = 0
-    orig_vid = numpy.zeros((frame_count, height, width, 3), dtype='uint8')
-    while True:
-        _, frame = capture.read()
+def load_video(directory):
+    imgs = []
+    for r,d,f in os.walk(directory):
+        for files in f:
+            if files.endswith(".png"):
+                imgs.append(os.path.join(r,files))
 
-        if frame == None or x >= frame_count:
-            break
-        orig_vid[x] = frame
-        x += 1
-    capture.release()
 
-    return orig_vid, fps
+    frame_count = 1
+    width = cv.LoadImage(imgs[0]).width
+    height = cv.LoadImage(imgs[0]).height
+    orig_vid = []
+
+    for img in imgs:
+        orig_vid.append(cv2.imread(img))
+
+
+    return numpy.array(orig_vid), 1
+
+    # capture = cv2.VideoCapture(video_filename)
+    # frame_count = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT))
+    # width, height = get_capture_dimensions(capture)
+    # fps = int(capture.get(cv.CV_CAP_PROP_FPS))
+    # x = 0
+    # orig_vid = numpy.zeros((frame_count, height, width, 3), dtype='uint8')
+    # while True:
+    #     _, frame = capture.read()
+
+    #     if frame == None or x >= frame_count:
+    #         break
+    #     orig_vid[x] = frame
+    #     x += 1
+    # capture.release()
+
+    # return orig_vid, fps
 
 
 def save_video(video, fps, save_filename='media/output.avi'):
