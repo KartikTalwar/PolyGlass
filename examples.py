@@ -1,7 +1,7 @@
 from eulerian_magnify import eulerian_magnification, show_frequencies
 
 
-# print show_frequencies('/home/ktalwar/Downloads/opencv-2.4.6.1/eulerian-magnification/smile.avi')
+#print show_frequencies('p')
 print eulerian_magnification('p', image_processing='gaussian', pyramid_levels=3, freq_min=50.0 / 60.0, freq_max=1.0, amplification=50)
 
 #show_frequencies('media/baby.mp4')

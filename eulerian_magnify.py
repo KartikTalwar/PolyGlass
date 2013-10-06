@@ -16,17 +16,23 @@ def eulerian_magnification(video_filename, image_processing='gaussian', freq_min
     path_to_video = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), video_filename)
     orig_vid, fps = load_video(path_to_video)
     if image_processing == 'gaussian':
+        enlarge_factor = 8
         vid_data = gaussian_video(orig_vid, pyramid_levels)
     elif image_processing == 'laplacian':
+        enlarge_factor = 10
         vid_data = laplacian_video(orig_vid, pyramid_levels)
     vid_data = temporal_bandpass_filter(vid_data, fps, freq_min=freq_min, freq_max=freq_max)
     print "Amplifying signal by factor of " + str(amplification)
     vid_data *= amplification
-    print scipy.misc.imsave('outfile.jpg', vid_data[0].real)
-    return
+
+    #vid_data = numpy.repeat(numpy.repeat(vid_data, enlarge_factor, axis=1), enlarge_factor, axis=2)
+    #for i,x in enumerate(vid_data):
+    #    scipy.misc.imsave('out/mod-%s.png' % (i), x.real)
+
+    #return
     # return cv2.imwrite('aa.png', vid_data[0])
-    file_name = os.path.splitext(path_to_video)[0]
-    file_name = file_name + "_min"+str(freq_min)+"_max"+str(freq_max)+"_amp"+str(amplification)
+    #file_name = os.path.splitext(path_to_video)[0]
+    file_name = "main_min"+str(freq_min)+"_max"+str(freq_max)+"_amp"+str(amplification)
     combine_pyramid_and_save(vid_data, orig_vid, pyramid_levels, fps, save_filename=file_name + '_magnified.avi')
 
 
@@ -69,9 +75,9 @@ def temporal_bandpass_filter(data, fps, freq_min=0.833, freq_max=1, axis=0):
     frequencies = scipy.fftpack.fftfreq(data.shape[0], d=1.0 / fps)
     bound_low = (numpy.abs(frequencies - freq_min)).argmin()
     bound_high = (numpy.abs(frequencies - freq_max)).argmin()
-    # fft[:bound_low] = 0
-    # fft[bound_high:-bound_high] = 0
-    # fft[-bound_low:] = 0
+    fft[:bound_high] = 0
+    #fft[bound_high:-bound_high] = 0
+    fft[-bound_low:] = 0
 
 
     return scipy.fftpack.ifft(fft, axis=0)
@@ -85,16 +91,18 @@ def load_video(directory):
                 imgs.append(os.path.join(r,files))
 
 
-    frame_count = 1
+    frame_count = 10
     width = cv.LoadImage(imgs[0]).width
     height = cv.LoadImage(imgs[0]).height
     orig_vid = []
+
+    print width, height
 
     for img in imgs:
         orig_vid.append(cv2.imread(img))
 
 
-    return numpy.array(orig_vid), 1
+    return numpy.array(orig_vid), frame_count
 
     # capture = cv2.VideoCapture(video_filename)
     # frame_count = int(capture.get(cv.CV_CAP_PROP_FRAME_COUNT))
@@ -160,7 +168,8 @@ def laplacian_video(video, shrink_multiple):
 
 def combine_pyramid_and_save(g_video, orig_video, enlarge_multiple, fps, save_filename='media/output.avi'):
     """Combine a gaussian video representation with the original and save to file"""
-    width, height = get_frame_dimensions(orig_video[0])
+    #width, height = get_frame_dimensions(orig_video[0])
+    width, height = 1600,1200
     fourcc = cv.CV_FOURCC('M', 'J', 'P', 'G')
     writer = cv2.VideoWriter(save_filename, fourcc, fps, (width, height), 1)
     for x in range(0, g_video.shape[0]):
@@ -199,3 +208,4 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
     y = scipy.signal.lfilter(b, a, data, axis=0)
     return y
+
