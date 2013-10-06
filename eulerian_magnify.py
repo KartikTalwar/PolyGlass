@@ -4,6 +4,7 @@ import sys
 
 import numpy
 import pylab
+import scipy
 import scipy.signal
 import scipy.fftpack
 
@@ -21,6 +22,9 @@ def eulerian_magnification(video_filename, image_processing='gaussian', freq_min
     vid_data = temporal_bandpass_filter(vid_data, fps, freq_min=freq_min, freq_max=freq_max)
     print "Amplifying signal by factor of " + str(amplification)
     vid_data *= amplification
+    print scipy.misc.imsave('outfile.jpg', vid_data[0].real)
+    return
+    # return cv2.imwrite('aa.png', vid_data[0])
     file_name = os.path.splitext(path_to_video)[0]
     file_name = file_name + "_min"+str(freq_min)+"_max"+str(freq_max)+"_amp"+str(amplification)
     combine_pyramid_and_save(vid_data, orig_vid, pyramid_levels, fps, save_filename=file_name + '_magnified.avi')
@@ -65,9 +69,10 @@ def temporal_bandpass_filter(data, fps, freq_min=0.833, freq_max=1, axis=0):
     frequencies = scipy.fftpack.fftfreq(data.shape[0], d=1.0 / fps)
     bound_low = (numpy.abs(frequencies - freq_min)).argmin()
     bound_high = (numpy.abs(frequencies - freq_max)).argmin()
-    fft[:bound_low] = 0
-    fft[bound_high:-bound_high] = 0
-    fft[-bound_low:] = 0
+    # fft[:bound_low] = 0
+    # fft[bound_high:-bound_high] = 0
+    # fft[-bound_low:] = 0
+
 
     return scipy.fftpack.ifft(fft, axis=0)
 
