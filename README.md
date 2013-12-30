@@ -1,5 +1,7 @@
-Eulerian Video Magnification v0.1
+PolyGlass
 =================================
+
+![](http://3.bp.blogspot.com/-hfTMrWLyLgo/UpEWqKg63gI/AAAAAAAADao/o7P7PYHGZHY/s1600/Screen+shot+2013-11-23+at+3.56.25+PM.png)
 
 A tool to discover hidden variation in video.  This is based on the amazing research done at MIT:
 http://people.csail.mit.edu/mrub/vidmag/
@@ -60,7 +62,3 @@ Additionally, some videos are better suited to motion amplification using a lapl
 On windows it may be neccesary to add *C:\\OpenCV2.3\\build\\x86\\vc10\\bin* to the system path for videos to load
 properly.  Make sure you adjust the path to the actual location of your opencv library.
 
-Author
-------
-
-Bryce Drennan <eulerian-magnify@brycedrennan.com>
